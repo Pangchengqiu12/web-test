@@ -1,30 +1,33 @@
 let addId = 1004
+let pageSize = document.querySelector("[name=pageSizeValue]").value
+
+
 window.onload = function () {
     let studentArr = [
-        { studentId: 1001, studentName: "duoduo", studentGrade: "二年级" },
-        { studentId: 1002, studentName: "goudan", studentGrade: "一年级" },
-        { studentId: 1003, studentName: "zhangsan", studentGrade: "四年级" },
-        { studentId: 1004, studentName: "lisi", studentGrade: "三年级" }
+        { studentId: 1001, studentName: "duoduo", studentGrade: "一年级" },
+        { studentId: 1002, studentName: "goudan", studentGrade: "二年级" },
+        { studentId: 1003, studentName: "zhangsan", studentGrade: "三年级" },
+        { studentId: 1004, studentName: "lisi", studentGrade: "四年级" }
     ]
     localStorage.setItem("studentInform", JSON.stringify(studentArr))
     var student = JSON.parse(localStorage.getItem("studentInform"))
     render(student)
+    renderGrade()
 }
 //页面渲染
-function render(data) {
-    // for (let i = 1; i < document.querySelector("#grade").children.length; i++) {
-    //     document.querySelector("#grade").children[i].remove()
-    // }
-    // for (let i = 1; i < document.querySelector("#grade1").children.length; i++) {
-    //     document.querySelector("#grade1").children[i].remove()
-    // }
+function render(data, page) {
+    page = page || 1
+    let pageN = Math.ceil(data.length / pageSize)
+    document.querySelector("#page").innerHTML = page
+    document.querySelector("#pageN").innerHTML = pageN
+    let pageData = data.splice((page - 1) * pageSize, pageSize)
     document.querySelector("#studentInform tbody").innerHTML = ""
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < pageData.length; i++) {
         let tr = document.createElement("tr")
         tr.innerHTML = `
-                <td>${data[i].studentId}</td>
-                <td>${data[i].studentName}</td>
-                <td>${data[i].studentGrade}</td>
+                <td>${pageData[i].studentId}</td>
+                <td>${pageData[i].studentName}</td>
+                <td>${pageData[i].studentGrade}</td>
                 <td class="control">
                     <a href="javascript:void(0)">修改</a>
                     <a href="javascript:void(0)">删除</a>
@@ -34,32 +37,34 @@ function render(data) {
         tr.querySelector(".control").children[0].addEventListener("click", change)
         document.querySelector("#studentInform tbody").appendChild(tr)
     }
+}
+function renderGrade() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+
     //获取年级
     let grade = document.getElementById('grade').children
     let grade1 = document.getElementById('grade1').children
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < student.length; i++) {
         for (let j = 0; j < grade.length; j++) {
-            if (data[i].studentGrade == grade[j].innerHTML) {
+            if (student[i].studentGrade == grade[j].innerHTML) {
                 break
             }
-            let option = document.createElement("option")
-            option.innerHTML = data[i].studentGrade
-            option.value = data[i].studentId
-            document.querySelector("#grade").appendChild(option)
-            break
         }
+        let option = document.createElement("option")
+        option.innerHTML = student[i].studentGrade
+        option.value = student[i].studentId
+        document.querySelector("#grade").appendChild(option)
     }
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < student.length; i++) {
         for (let j = 0; j < grade1.length; j++) {
-            if (data[i].studentGrade == grade1[j].innerHTML) {
+            if (student[i].studentGrade == grade1[j].innerHTML) {
                 break
             }
-            let option = document.createElement("option")
-            option.innerHTML = data[i].studentGrade
-            option.value = data[i].studentId
-            document.querySelector("#grade1").appendChild(option)
-            break
         }
+        let option = document.createElement("option")
+        option.innerHTML = student[i].studentGrade
+        option.value = student[i].studentId
+        document.querySelector("#grade1").appendChild(option)
     }
 }
 //信息查询
@@ -130,6 +135,7 @@ function search() {
     }
     render(arr)
 }
+
 //给本地添加数据
 let add = document.getElementsByClassName("add")[0]
 //添加增加绑定事件
@@ -238,6 +244,82 @@ function change() {
             document.getElementById("grade1").value = student[i].studentId
         }
     }
+}
+//下一页
+document.querySelector("#nextPage").addEventListener("click", nextP)
+function nextP() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    let newPage = document.querySelector("#page").innerHTML
+    newPage >= Math.ceil(student.length / pageSize) ? newPage = Math.ceil(student.length / pageSize) : newPage++
+    render(student, newPage)
+}
+//上一页
+document.querySelector("#previousPage").addEventListener("click", previousP)
+function previousP() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    let newPage = document.querySelector("#page").innerHTML
+    newPage <= 1 ? newPage = 1 : newPage--
+    render(student, newPage)
+}
+//跳转首页
+document.querySelector("#firstPage").addEventListener("click", firstP)
+function firstP() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    render(student,)
+}
+//跳转至尾页
+document.querySelector("#lastPage").addEventListener("click", lastP)
+function lastP() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    let newPage = Math.ceil(student.length / pageSize)
+    render(student, newPage)
+}
+//跳转页面
+document.querySelector("#skipPage").addEventListener("click", skipP)
+function skipP() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    let newPage = document.querySelector("[name=skipValue]").value
+    if (isInt(newPage)) {
+        render(student, newPage)
+    } else {
+        hint()
+    }
 
-
+}
+//设置页面数据个数
+document.querySelector("[name=pageSizeValue]").addEventListener("change", changePageSize)
+function changePageSize() {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    if (parseInt(document.querySelector("[name=pageSizeValue]").value) == document.querySelector("[name=pageSizeValue]").value) {
+        pageSize = document.querySelector("[name=pageSizeValue]").value
+        render(student)
+    } else {
+        hint()
+    }
+}
+//判断是否是整数
+function isInt(number) {
+    let student = JSON.parse(localStorage.getItem("studentInform"))
+    if (parseInt(number) == number && number >= 1 && number <= Math.ceil(student.length / pageSize)) {
+        return true
+    } else {
+        return false
+    }
+}
+//错误提示
+function hint() {
+    let div = document.createElement("div")
+    div.style.width = "200px"
+    div.style.position = "absolute"
+    div.style.top = "40%"
+    div.style.left = "50%"
+    div.style.transform = "translateX(-50%)"
+    div.style.textAlign = "center"
+    div.style.border = "1px solid red"
+    div.style.backgroundColor = "#ddd"
+    div.innerHTML = "输入错误，重新输入"
+    document.body.appendChild(div)
+    setTimeout(function () {
+        div.remove()
+    }.bind(this, div), 1000)
 }

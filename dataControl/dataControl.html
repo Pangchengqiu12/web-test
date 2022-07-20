@@ -83,6 +83,17 @@
             margin-top: 24px;
             margin-bottom: 24px;
         }
+
+        #control {
+            width: 660px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #control input {
+            width: 40px;
+            height: 18px;
+        }
     </style>
 </head>
 
@@ -138,6 +149,20 @@
         </tbody>
 
     </table>
+    <div id="control">
+        <button id="firstPage">首页</button>
+        <button id="previousPage">上一页</button>
+        <button id="nextPage">下一页</button>
+        <button id="lastPage">尾页</button>
+        当前页:
+        <span id="page">1</span>
+        <span>/</span>
+        <span id="pageN">1</span>
+        <button id="skipPage">跳转至</button>
+        <input type="number" min="1" name="skipValue">
+        设置页面数据个数:
+        <input type="number" min="3" name="pageSizeValue" value="3">
+    </div>
     <script src="dataControl.js"></script>
 </body>
 
