@@ -2,7 +2,7 @@
 let fs = require("fs")
 
 //读取
-fs.readFile("./file/1.text", "utf-8", function (err, dataStr) {
+fs.readFile(__dirname + "/file/1.text", "utf-8", function (err, dataStr) {
     if (err) {
         return console.log("读取失败" + err.message);
     }
